@@ -1,0 +1,94 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.38.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           aoc
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/Rekwass/AdventOfCode#readme>
+homepage:       https://github.com/Rekwass/AdventOfCode#readme
+bug-reports:    https://github.com/Rekwass/AdventOfCode/issues
+author:         Nicolas MOINARD
+maintainer:     rekwass@gmail.com
+copyright:      Copyright (c) 2024, Nicolas MOINARD
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+
+source-repository head
+  type: git
+  location: https://github.com/Rekwass/AdventOfCode
+
+library
+  exposed-modules:
+      Algorithm
+      Day01
+      Day02
+      Day03
+      Day04
+      Day05
+      Day06
+      Day07
+      Day08
+      Day09
+      Day10
+      Day11
+      Day12
+      Day13
+      Day14
+      Day15
+      Day16
+      Day17
+      Day18
+      Day19
+      Day20
+      Day21
+      Day22
+      Day23
+      Day24
+      Day25
+  other-modules:
+      Paths_aoc
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      MemoTrie >=0.6.11
+    , base >=4.7 && <5
+    , composition >=1.0.2.2
+    , containers >=0.6.7
+    , hashable >=1.4.3.0
+    , lens >=5.2.3
+    , linear >=1.22
+    , matrix >=0.3.6.3
+    , multiset >=0.3.4.3
+    , pcre-heavy >=1.0.0.3
+    , psqueues >=0.2.8.0
+    , search-algorithms >=0.3.2
+    , split >=0.2.5
+  default-language: Haskell2010
+
+executable aoc-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_aoc
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      MemoTrie >=0.6.11
+    , aoc
+    , base >=4.7 && <5
+    , composition >=1.0.2.2
+    , containers >=0.6.7
+    , hashable >=1.4.3.0
+    , lens >=5.2.3
+    , linear >=1.22
+    , matrix >=0.3.6.3
+    , multiset >=0.3.4.3
+    , pcre-heavy >=1.0.0.3
+    , psqueues >=0.2.8.0
+    , search-algorithms >=0.3.2
+    , split >=0.2.5
+  default-language: Haskell2010
