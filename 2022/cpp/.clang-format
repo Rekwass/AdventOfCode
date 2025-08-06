@@ -1,0 +1,16 @@
+# https://webkit.org/code-style-guidelines
+
+BasedOnStyle: WebKit
+---
+Language: Cpp
+
+DisableFormat: false
+Standard: Latest
+
+AllowShortEnumsOnASingleLine: false
+AlwaysBreakTemplateDeclarations: Yes
+BreakConstructorInitializers: AfterColon
+AccessModifierOffset: -1
+Cpp11BracedListStyle: true
+IncludeBlocks: Regroup
+SpaceBeforeCpp11BracedList: false
