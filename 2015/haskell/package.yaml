@@ -20,6 +20,11 @@ dependencies:
 - text >= 2.0.2
 - pcre-heavy >= 1.0.0.3
 - safe >= 0.3.21
+- vty >= 6.2
+- brick >= 2.4
+- microlens >= 0.4.13.1
+- microlens-th >= 0.4.3.17
+- microlens-mtl >= 0.2.0.3
 
 ghc-options:
 - -Wall
