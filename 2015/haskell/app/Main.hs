@@ -29,7 +29,7 @@ import Text.Read (readMaybe)
 
 import Lens.Micro ((^.))
 import Lens.Micro.TH (makeLenses)
-import Lens.Micro.Mtl (use, (.=))
+import Lens.Micro.Mtl (use, (.=), zoom)
 
 import qualified Graphics.Vty as V
 
@@ -131,61 +131,42 @@ drawUI st =
       partLayer = D.renderDialog (st^.part) $ C.hCenter $ padAll 1 $ str "Select a part!"
       -- doneLayer d p = C.center $ C.joinBorders $ C.withBorderStyle unicode $ borderWithLabel (str $ "Day " <> show d <> ", part " <> show p) (C.center (str "983473847283472384"))
       -- TODO: Make a nice box to display result
+      -- TODO: Find another way to compute than running unsafePerformIO in the UI part...
       doneLayer d p = C.center $ str $ "Day " <> show d <> ", part " <> show p <> ", result: " <> aoc d p (unsafePerformIO (readFile "../inputs/day1.txt"))
 
 appEvent :: BrickEvent Name e -> T.EventM Name St ()
-appEvent (VtyEvent ev) =
-    case ev of
+appEvent (VtyEvent e) =
+    case e of
         V.EvKey V.KEsc [] -> M.halt
         V.EvKey V.KEnter [] -> do
           s <- use step
           case s of
-            ChooseDay -> do
-              d <- use day
-              let res = D.dialogSelection d
-              case res of
-                (Just (_, val)) -> do
-                  step .= ChoosePart val
-                Nothing -> return ()
-            ChoosePart chosenDay -> do
-              p <- use part
-              let res = D.dialogSelection p
-              case res of
-                (Just (_, val)) -> do
-                  step .= Done  chosenDay val
-                Nothing -> return ()
-            Done _ _ -> M.halt
+            ChooseDay              -> onSelect day  $ \(_, val) -> step .= ChoosePart val
+            ChoosePart chosenDay   -> onSelect part $ \(_, val) -> step .= Done chosenDay val
+            Done       _         _ -> M.halt
         V.EvKey V.KBS [] -> do
           s <- use step
           case s of
-            ChooseDay -> return ()
-            ChoosePart _ -> step .= ChooseDay
-            Done chosenDay _ -> step .= ChoosePart chosenDay
+            ChooseDay              -> return ()
+            ChoosePart _           -> step .= ChooseDay
+            Done       chosenDay _ -> step .= ChoosePart chosenDay
         _ -> do
           s <- use step
           case s of
-            ChooseDay -> do
-              st <- T.get
-              dayState <- use day
-              (newDayState, ()) <- T.nestEventM dayState $ do
-                D.handleDialogEvent ev
-              day .= newDayState
-              T.put st {_day=newDayState}
-            ChoosePart _ -> do
-              st <- T.get
-              partState <- use part
-              (newPartState, ()) <- T.nestEventM partState $ do
-                D.handleDialogEvent ev
-              part .= newPartState
-              T.put st {_part=newPartState}
-            Done _ _ -> M.halt
+            ChooseDay      -> zoom day  $ D.handleDialogEvent e
+            ChoosePart _   -> zoom part $ D.handleDialogEvent e
+            Done       _ _ -> M.halt
+  where
+    onSelect field action = do
+      res <- D.dialogSelection <$> use field
+      maybe (return ()) action res
 appEvent _ = return ()
 
 theMap :: A.AttrMap
 theMap = A.attrMap V.defAttr
-    [ (D.dialogAttr, V.white `on` V.blue)
+    [ (D.dialogAttr, V.white `on` V.red)
     , (D.buttonAttr, V.black `on` V.white)
-    , (D.buttonSelectedAttr, bg V.yellow)
+    , (D.buttonSelectedAttr, bg V.green)
     ]
 
 initialState :: St
