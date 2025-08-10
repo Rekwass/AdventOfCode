@@ -34,7 +34,6 @@ import Lens.Micro.Mtl (use, (.=), zoom)
 import qualified Graphics.Vty as V
 
 import qualified Brick.Main as M
-import qualified Brick.Widgets.Dialog as D
 import qualified Brick.Types as T
 import qualified Brick.Widgets.Center as C
 import qualified Brick.AttrMap as A
@@ -45,7 +44,9 @@ import Brick.Util (on, bg)
 import qualified Brick as C
 import Brick.Widgets.Border.Style (unicode)
 import Brick.Widgets.Border (borderWithLabel)
+
 import System.IO.Unsafe (unsafePerformIO)
+import MyDialog
 
 data Name =
       DayOneBtn
@@ -86,8 +87,8 @@ type Part = Int
 type InputPath = String
 type Input = String
 
-data St = St { _day :: D.Dialog Int Name
-             , _part :: D.Dialog Int Name
+data St = St { _day :: Dialog Int Name
+             , _part :: Dialog Int Name
              , _step :: Step}
 
 data Step = ChooseDay | ChoosePart Int | Done Int Int deriving (Eq, Show)
@@ -107,7 +108,7 @@ main = do
       return ()
 
 filterArgs :: [String] -> Maybe Args
-filterArgs [d, p, path] = Just (read d, read p, path)
+filterArgs [d, p, path]      = Just (read d, read p, path)
 filterArgs _                 = Nothing
 
 theApp :: M.App St e Name
@@ -122,17 +123,15 @@ theApp =
 drawUI :: St -> [T.Widget Name]
 drawUI st = 
   case _step st of
-    ChooseDay -> [dayLayer]
-    ChoosePart _ -> [partLayer]
-    Done d p -> [doneLayer d p]
+    ChooseDay      -> [dayLayer]
+    ChoosePart _   -> [partLayer]
+    Done       d p -> [doneLayer d p]
     where
-      -- TODO: Make my own dialog as this one does not wrap (not displaying 25 possible selections)
-      dayLayer = D.renderDialog (st^.day) $ C.hCenter $ padAll 1 $ str "Select a day!"
-      partLayer = D.renderDialog (st^.part) $ C.hCenter $ padAll 1 $ str "Select a part!"
-      -- doneLayer d p = C.center $ C.joinBorders $ C.withBorderStyle unicode $ borderWithLabel (str $ "Day " <> show d <> ", part " <> show p) (C.center (str "983473847283472384"))
-      -- TODO: Make a nice box to display result
+      dayLayer = renderDialog (st^.day)
+      partLayer = renderDialog (st^.part)
+      doneLayer d p = C.centerLayer $ C.withDefAttr dialogAttr $ C.hLimit 50 $ C.vLimit 5 $ C.joinBorders $ C.withBorderStyle unicode $ borderWithLabel (str $ "Day " <> show d <> ", part " <> show p) (C.center $ C.withDefAttr buttonAttr (str $ " " <> aoc d p (unsafePerformIO (readFile "../inputs/day1.txt")) <> " "))
       -- TODO: Find another way to compute than running unsafePerformIO in the UI part...
-      doneLayer d p = C.center $ str $ "Day " <> show d <> ", part " <> show p <> ", result: " <> aoc d p (unsafePerformIO (readFile "../inputs/day1.txt"))
+      -- doneLayer d p = C.centerLayer $ C.hLimit 50 $ C.joinBorders $ C.withBorderStyle unicode $ str $ "Day " <> show d <> ", part " <> show p <> ", result: " <> aoc d p (unsafePerformIO (readFile "../inputs/day1.txt"))
 
 appEvent :: BrickEvent Name e -> T.EventM Name St ()
 appEvent (VtyEvent e) =
@@ -153,36 +152,36 @@ appEvent (VtyEvent e) =
         _ -> do
           s <- use step
           case s of
-            ChooseDay      -> zoom day  $ D.handleDialogEvent e
-            ChoosePart _   -> zoom part $ D.handleDialogEvent e
+            ChooseDay      -> zoom day  $ handleDialogEvent e
+            ChoosePart _   -> zoom part $ handleDialogEvent e
             Done       _ _ -> M.halt
   where
     onSelect field action = do
-      res <- D.dialogSelection <$> use field
+      res <- dialogSelection <$> use field
       maybe (return ()) action res
 appEvent _ = return ()
 
 theMap :: A.AttrMap
 theMap = A.attrMap V.defAttr
-    [ (D.dialogAttr, V.white `on` V.red)
-    , (D.buttonAttr, V.black `on` V.white)
-    , (D.buttonSelectedAttr, bg V.green)
+    [ (dialogAttr, V.white `on` V.green)
+    , (buttonAttr, V.black `on` V.white)
+    , (buttonSelectedAttr, bg V.yellow)
     ]
 
 initialState :: St
 initialState = St { _day = d, _part = p, _step = ChooseDay }
   where
-    d = D.dialog (Just $ str "Title") (Just (DayOneBtn, choicesDay)) 1000
-    p = D.dialog (Just $ str "Title") (Just (PartOneBtn, choicesPart)) 50
-    choicesDay = [ ("1", DayOneBtn, 1)
-                 , ("2", DayTwoBtn, 2)
-                 , ("3", DayThreeBtn, 3)
-                 , ("4", DayFourBtn, 4)
-                 , ("5", DayFiveBtn, 5)
-                 , ("6", DaySixBtn, 6)
-                 , ("7", DaySevenBtn, 7)
-                 , ("8", DayEightBtn, 8)
-                 , ("9", DayNineBtn, 9)
+    d = dialog (Just $ str "Select a day!") (Just (DayOneBtn, choicesDay)) 50
+    p = dialog (Just $ str "Select a part!") (Just (PartOneBtn, choicesPart)) 50
+    choicesDay = [ ("01", DayOneBtn, 1)
+                 , ("02", DayTwoBtn, 2)
+                 , ("03", DayThreeBtn, 3)
+                 , ("04", DayFourBtn, 4)
+                 , ("05", DayFiveBtn, 5)
+                 , ("06", DaySixBtn, 6)
+                 , ("07", DaySevenBtn, 7)
+                 , ("08", DayEightBtn, 8)
+                 , ("09", DayNineBtn, 9)
                  , ("10", DayTenBtn, 10)
                  , ("11", DayElevenBtn, 11)
                  , ("12", DayTwelveBtn, 12)
