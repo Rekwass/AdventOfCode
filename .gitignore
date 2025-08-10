@@ -80,3 +80,7 @@ build/
 # Mac
 
 .DS_Store
+
+# Aoc
+
+inputs/
