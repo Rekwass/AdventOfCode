@@ -125,7 +125,6 @@ drawUI st =
       partLayer = renderDialog (st^.part)
       doneLayer d p = C.centerLayer $ C.withDefAttr dialogAttr $ C.hLimit 50 $ C.vLimit 5 $ C.joinBorders $ C.withBorderStyle unicode $ borderWithLabel (str $ "{ Day " <> show d <> ", part " <> show p <> " }") (C.center $ C.withDefAttr buttonAttr (str $ " " <> aoc d p (unsafePerformIO (readFile ("../inputs/day" <> show d <> ".txt"))) <> " "))
       -- TODO: Find another way to compute than running unsafePerformIO in the UI part...
-      -- doneLayer d p = C.centerLayer $ C.hLimit 50 $ C.joinBorders $ C.withBorderStyle unicode $ str $ "Day " <> show d <> ", part " <> show p <> ", result: " <> aoc d p (unsafePerformIO (readFile "../inputs/day1.txt"))
 
 appEvent :: BrickEvent Name e -> T.EventM Name St ()
 appEvent (VtyEvent e) =
