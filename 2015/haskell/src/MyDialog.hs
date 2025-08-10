@@ -41,7 +41,7 @@ import Brick.AttrMap
 import Data.List.Split (chunksOf)
 
 data Dialog a n =
-    Dialog { dialogTitle :: Maybe (Widget n)
+    Dialog { dialogTitle :: Widget n
            , dialogButtons :: [(String, n, a)]
            , dialogWidth :: Int
            , dialogFocus :: FocusRing n
@@ -67,7 +67,7 @@ setDialogFocus n d = d { dialogFocus = focusSetCurrent n $ dialogFocus d }
 getDialogFocus :: Dialog a n -> Maybe n
 getDialogFocus = focusGetCurrent . dialogFocus
 
-dialog :: (Eq n) => Maybe (Widget n) -> Maybe (n, [(String, n, a)]) -> Int -> Dialog a n
+dialog :: (Eq n) => Widget n -> Maybe (n, [(String, n, a)]) -> Int -> Dialog a n
 dialog title buttonData w =
     let (r, buttons) = case buttonData of
             Nothing                 -> (focusRing [], [])
@@ -104,12 +104,14 @@ renderDialog d =
         btnRows = hBox . intersperse buttonPadding
         realBtnRow = map btnRows $ chunksOf 5 buttons
         vertBtns = vBox $ mapTail (padTop (Pad 1)) realBtnRow
-        doBorder = maybe border borderWithLabel (d^.dialogTitleL)
+        doBorder = borderWithLabel (d^.dialogTitleL)
     in centerLayer $
        withDefAttr dialogAttr $
        hLimit (d^.dialogWidthL) $
        doBorder $
-       vBox [str " ", hCenter vertBtns, str " "]
+       vBox [
+       str " ", hCenter vertBtns, str " "
+       ]
 
 mapTail :: (a -> a) -> [a] -> [a]
 mapTail _ []     = []
