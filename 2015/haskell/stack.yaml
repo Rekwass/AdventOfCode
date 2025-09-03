@@ -35,7 +35,8 @@ local-bin-path: .
 
 packages: ["."]
 
-resolver: lts-23.16
+resolver: lts-23.28
+compiler: ghc-9.8.4
 
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
