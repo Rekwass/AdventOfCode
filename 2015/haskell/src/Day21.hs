@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Day21 (day21a, day21b) where
 import Data.List.Split (splitOn)
 
@@ -74,5 +75,5 @@ allPlayerStats = map (`applyStats` player) allComb
 day21b :: String -> String
 day21b = show . part2 . parseLines . lines
 
-part2 :: (HitPoint, Damage, Armour) -> Int
+part2 :: Boss -> Int
 part2 boss = fst $ foldr (\(g, p) (cg, cp) -> if g > cg && not (fight p boss) then (g, p) else (cg, cp)) (0, player) allPlayerStats
