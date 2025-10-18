@@ -32,7 +32,7 @@ rings = [(25 , 1, 0),
          (40 , 0, 2),
          (80 , 0, 3)]
 
-player :: (HitPoint, Damage, Armour)
+player :: Player
 player = (100, 0, 0)
 
 day21a :: String -> String
