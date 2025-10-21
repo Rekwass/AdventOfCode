@@ -12,7 +12,6 @@ import qualified Data.Map as M
 import Data.List.Split (splitOn)
 import Algorithm (dijkstra)
 import Data.Maybe (isNothing, fromJust)
-import Data.Bifunctor (first)
 
 {------------------------------{ 1st part }------------------------------}
 
@@ -76,85 +75,112 @@ parseLines [shp, sdmg] = Boss (read bhp') (read dmg')
 parseLines _ = error "Invalid file"
 
 part1 :: Boss -> Int
-part1 b = myDijkstra (GameState ogPlayer b [] 0 PlayerTurn) getNeighbours' isGoal'
+part1 b = myDijkstra (GameState ogPlayer b [] 0 PlayerTurn) nextGameState isWon
 
 -- Give all possible GameStates from current (none if lost)
-getNeighbours' :: GameState -> [(GameState, Mana)]
-getNeighbours' g
-  | g'.player.hp > 0 && g'.boss.bhp <= 0 = [(g', 0)]
-  | g'.player.hp <= 0 || g'.player.mana < 53 = [] -- Check if player has enough mana after apply effect
-  | g'.turn == BossTurn = map (first removeShield) (bossAttack g')
-  | otherwise = map (first removeShield) (chooseSpellAndAttack g')
-  where
-    g' = applyEffects g
+nextGameState :: GameState -> [(GameState, Mana)]
+nextGameState = removeEffects . playTurn . applyEffects
 
 applyEffects :: GameState -> GameState
-applyEffects (GameState p b ss m t) = GameState np nb nss m t
+applyEffects (GameState p b ss m t) = GameState p' b' ss' m t
   where
     -- (GameState p' b' ss' _ _) = removeShield g
-    (np, nb, nss) = foldr applyEffect (p, b, []) ss
+    (p', b', ss') = foldr applyEffect (p, b, []) ss
 
-removeShield :: GameState -> GameState
-removeShield g 
-  | any isShield g.effects = g
-  | otherwise              = g { player = np }
+playTurn :: GameState -> [(GameState, Mana)]
+playTurn g
+  | g.turn == BossTurn = bossAttack g
+  | otherwise          = playerAttack g
+
+playerAttack :: GameState -> [(GameState, Mana)]
+playerAttack g
+  | isWon g = [(g, 0)]
+  | isLost g = [] -- Check if player has enough mana after apply effect
+  | otherwise = chooseSpellAndAttack g
+
+removeEffects :: [(GameState, Mana)] -> [(GameState, Mana)]
+removeEffects = map removeShield
+
+removeShield :: (GameState, Mana) -> (GameState, Mana)
+removeShield gm@(g, m)
+  | any isShield g.effects = gm
+  | otherwise              = (g { player = p' }, m)
     where
-      np = g.player { armour = 0 }
+      p' = g.player { armour = 0 }
 
 isShield :: (Turn, Spell) -> Bool
 isShield (_, Shield {}) = True
-isShield _ = False
+isShield _              = False
 
 applyEffect :: (Turn, Spell) -> (Player, Boss, [(Turn, Spell)]) -> (Player, Boss, [(Turn, Spell)])
-applyEffect (tl, s@(Shield _ _ arm)) (p, b, nss)
-  | tl == 1   = (p { armour = arm } , b, nss)
-  | otherwise = (p { armour = arm}, b, (tl - 1, s):nss)
-applyEffect (tl, s@(Poison _ _ dmg)) (p, b, nss)
-  | tl == 1   = (p, b { bhp = b.bhp - dmg}, nss)
-  | otherwise = (p, b { bhp = b.bhp - dmg}, (tl - 1, s):nss)
-applyEffect (tl, s@(Recharge _ _ m)) (p, b, nss)
-  | tl == 1   = (p { mana = p.mana + m }, b, nss)
-  | otherwise = (p { mana = p.mana + m }, b, (tl - 1, s):nss)
+applyEffect (t, s@(Shield _ _ arm)) (p, b, nss)
+  | t == 1    = (p { armour = arm } , b, nss)
+  | otherwise = (p { armour = arm}, b, (t - 1, s):nss)
+applyEffect (t, s@(Poison _ _ dmg)) (p, b, nss)
+  | t == 1    = (p, b { bhp = b.bhp - dmg}, nss)
+  | otherwise = (p, b { bhp = b.bhp - dmg}, (t - 1, s):nss)
+applyEffect (t, s@(Recharge _ _ m)) (p, b, nss)
+  | t == 1    = (p { mana = p.mana + m }, b, nss)
+  | otherwise = (p { mana = p.mana + m }, b, (t - 1, s):nss)
 applyEffect _ _ = error "Could not apply effect ?"
 
 chooseSpellAndAttack :: GameState -> [(GameState, Mana)]
 chooseSpellAndAttack g = map (castSpell g) availableSpells
   where
-    availableSpells = filter (\s -> hasMana s && not (isActive s)) spells
-    isActive s = any ((0 ==) . fst) g.effects || s `elem` map snd g.effects
-    hasMana (MagicMissile m _) = g.player.mana >= m
-    hasMana (Drain m _ _) = g.player.mana >= m
-    hasMana (Shield m _ _) = g.player.mana >= m
-    hasMana (Poison m _ _) = g.player.mana >= m
-    hasMana (Recharge m _ _) = g.player.mana >= m
+    availableSpells              = filter hasMana . filter (not . isActive) $ spells
+    isActive s                   = s `elem` map snd g.effects
+    hasMana (MagicMissile m _)   = g.player.mana >= m
+    hasMana (Drain        m _ _) = g.player.mana >= m
+    hasMana (Shield       m _ _) = g.player.mana >= m
+    hasMana (Poison       m _ _) = g.player.mana >= m
+    hasMana (Recharge     m _ _) = g.player.mana >= m
 
 castSpell :: GameState -> Spell -> (GameState, Mana)
-castSpell g (MagicMissile m dmg)     = (g { player = np, boss = nb, manaSpent = g.manaSpent + m, turn = BossTurn}, m)
+castSpell g sp = (apply sp g, cost sp)
   where
-    np = g.player { mana = g.player.mana - m }
-    nb = g.boss { bhp = g.boss.bhp - dmg}
-castSpell g (Drain        m dmg dhp) = (g { player = np, boss = nb, manaSpent = g.manaSpent + m, turn = BossTurn }, m)
-  where
-    np = g.player { hp = g.player.hp + dhp, mana = g.player.mana - m }
-    nb = g.boss { bhp = g.boss.bhp - dmg}
-castSpell g s@(Shield       m t _)   = (g { player = np, manaSpent = g.manaSpent + m, effects = (t,s):g.effects, turn = BossTurn }, m)
-  where
-    np = g.player { mana = g.player.mana - m }
-castSpell g s@(Poison       m t _)   = (g { player = np, manaSpent = g.manaSpent + m, effects = (t,s):g.effects, turn = BossTurn }, m)
-  where
-    np = g.player { mana = g.player.mana - m }
-castSpell g s@(Recharge     m t _)   = (g { player = np,manaSpent = g.manaSpent + m, effects = (t,s):g.effects, turn = BossTurn }, m)
-  where
-    np = g.player { mana = g.player.mana - m }
+    cost (MagicMissile m _)   = m
+    cost (Drain        m _ _) = m
+    cost (Shield       m _ _) = m
+    cost (Poison       m _ _) = m
+    cost (Recharge     m _ _) = m
+
+    spendMana m p = p { mana = p.mana - m }
+
+    apply (MagicMissile m dmg)     g' = g' { player = spendMana m g'.player
+                                           , boss = g'.boss { bhp = g'.boss.bhp - dmg }
+                                           , manaSpent = g'.manaSpent + m
+                                           , turn = BossTurn }
+    apply (Drain        m dmg dhp) g' = g' { player = (spendMana m g'.player) { hp = g'.player.hp + dhp }
+                                           , boss = g'.boss { bhp = g'.boss.bhp - dmg }
+                                           , manaSpent = g'.manaSpent + m
+                                           , turn = BossTurn }
+    apply s@(Shield     m t   _)  g' = addEffect m t s g'
+    apply s@(Poison     m t   _)  g' = addEffect m t s g'
+    apply s@(Recharge   m t   _)  g' = addEffect m t s g'
+
+    addEffect m t s g' = g' { player = spendMana m g'.player
+                            , manaSpent = g'.manaSpent + m
+                            , effects = (t, s) : g'.effects
+                            , turn = BossTurn }
 
 bossAttack :: GameState -> [(GameState, Mana)]
-bossAttack g = [(g { player = p, turn = PlayerTurn }, 0)]
+bossAttack g
+  | isWon        g  = [(g, 0)]
+  | isPlayerDead g' = []
+  | otherwise       = [(g', 0)]
   where
-    p = g.player { hp = g.player.hp - max (g.boss.damage - g.player.armour) 1 }
+    p  = g.player { hp = g.player.hp - max (g.boss.damage - g.player.armour) 1 }
+    g' = g { player = p, turn = PlayerTurn }
 
--- True if boss dead
-isGoal' :: GameState -> Bool
-isGoal' g = g.boss.bhp <= 0
+-- True if player alive and boss dead
+isWon :: GameState -> Bool
+isWon g = g.player.hp > 0 && g.boss.bhp <= 0
+
+isLost :: GameState -> Bool
+isLost g = g.player.hp <= 0 || g.player.mana < 53 -- 53 is the lowest mana cost to cast a spell
+
+isPlayerDead :: GameState -> Bool
+isPlayerDead g = g.player.hp <= 0
 
 -- Find cheapest way to win against boss
 myDijkstra :: GameState -> (GameState -> [(GameState, Mana)]) -> (GameState -> Bool) -> Mana
@@ -175,18 +201,14 @@ day22b :: String -> String
 day22b = show . part2 . parseLines . lines
 
 part2 :: Boss -> Int
-part2 b = myDijkstra (GameState ogPlayer b [] 0 PlayerTurn) getNeighbours'' isGoal'
+part2 b = myDijkstra (GameState ogPlayer b [] 0 PlayerTurn) nextGameState' isWon
 
--- Give all possible GameStates from current (none if lost)
-getNeighbours'' :: GameState -> [(GameState, Mana)]
-getNeighbours'' g
-  | g'.turn == PlayerTurn && g'.player.hp > 1 && g'.boss.bhp <= 0 = [(g', 0)]
-  | g'.turn == BossTurn && g'.player.hp > 0 && g'.boss.bhp <= 0 = [(g', 0)]
-  | g'.turn == PlayerTurn && g'.player.hp <= 1 || g'.player.mana < 53 = [] -- Check if player has enough mana after apply effect
-  | g'.turn == BossTurn && g'.player.hp <= 0 || g'.player.mana < 53 = [] -- Check if player has enough mana after apply effect
-  | g'.turn == BossTurn = map (first removeShield) (bossAttack g')
-  | otherwise = map (first removeShield) (chooseSpellAndAttack looseOneHp)
+nextGameState' :: GameState -> [(GameState, Mana)]
+nextGameState' = removeEffects . playTurn . hitPlayer . applyEffects
+
+hitPlayer :: GameState -> GameState
+hitPlayer g
+  | g.turn == PlayerTurn = g { player = p' }
+  | otherwise            = g
   where
-    g' = applyEffects g
-    nb = g'.player {hp = g'.player.hp - 1}
-    looseOneHp = g' { player = nb }
+    p' = g.player { hp = g.player.hp - 1 }
