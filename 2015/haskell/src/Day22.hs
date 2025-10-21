@@ -3,8 +3,6 @@
 
 module Day22 (day22a, day22b) where
 
-import Prelude
-
 import GHC.Generics (Generic)
 import Data.Hashable (Hashable)
 import qualified Data.HashPSQ as H
