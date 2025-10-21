@@ -22,6 +22,7 @@ source-repository head
 
 library
   exposed-modules:
+      Algorithm
       Day01
       Day02
       Day03
@@ -43,6 +44,7 @@ library
       Day19
       Day20
       Day21
+      Day22
       MyDialog
   other-modules:
       Paths_aoc
@@ -56,10 +58,12 @@ library
     , brick >=2.4
     , bytestring >=0.11.5.3
     , containers >=0.6.7
+    , hashable >=1.4.3.0
     , microlens >=0.4.13.1
     , microlens-mtl >=0.2.0.3
     , microlens-th >=0.4.3.17
     , pcre-heavy >=1.0.0.3
+    , psqueues >=0.2.8.0
     , safe >=0.3.21
     , scientific >=0.3.7.0
     , split >=0.2.5
@@ -83,10 +87,12 @@ executable aoc-exe
     , brick >=2.4
     , bytestring >=0.11.5.3
     , containers >=0.6.7
+    , hashable >=1.4.3.0
     , microlens >=0.4.13.1
     , microlens-mtl >=0.2.0.3
     , microlens-th >=0.4.3.17
     , pcre-heavy >=1.0.0.3
+    , psqueues >=0.2.8.0
     , safe >=0.3.21
     , scientific >=0.3.7.0
     , split >=0.2.5

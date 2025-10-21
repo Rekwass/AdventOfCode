@@ -25,6 +25,8 @@ dependencies:
 - microlens >= 0.4.13.1
 - microlens-th >= 0.4.3.17
 - microlens-mtl >= 0.2.0.3
+- hashable >= 1.4.3.0
+- psqueues >= 0.2.8.0
 
 ghc-options:
 - -Wall
