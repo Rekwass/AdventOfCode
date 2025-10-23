@@ -45,6 +45,7 @@ library
       Day20
       Day21
       Day22
+      Day23
       MyDialog
   other-modules:
       Paths_aoc
