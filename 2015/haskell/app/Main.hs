@@ -25,6 +25,7 @@ import Day21 (day21a, day21b)
 import Day22 (day22a, day22b)
 import Day23 (day23a, day23b)
 import Day24 (day24a, day24b)
+import Day25 (day25a, day25b)
 
 import System.Environment (getArgs)
 
@@ -249,4 +250,6 @@ aoc 23 1 = day23a
 aoc 23 2 = day23b
 aoc 24 1 = day24a
 aoc 24 2 = day24b
+aoc 25 1 = day25a
+aoc 25 2 = day25b
 aoc _  _ = const "Not implemented yet!"
