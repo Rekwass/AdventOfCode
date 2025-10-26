@@ -46,6 +46,7 @@ library
       Day21
       Day22
       Day23
+      Day24
       MyDialog
   other-modules:
       Paths_aoc
@@ -53,7 +54,8 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      MissingH >=1.6.0.1
+      MemoTrie >=0.6.11
+    , MissingH >=1.6.0.1
     , aeson >=2.1.2.1
     , base >=4.7 && <5
     , brick >=2.4
@@ -81,7 +83,8 @@ executable aoc-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MissingH >=1.6.0.1
+      MemoTrie >=0.6.11
+    , MissingH >=1.6.0.1
     , aeson >=2.1.2.1
     , aoc
     , base >=4.7 && <5
