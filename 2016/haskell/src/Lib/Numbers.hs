@@ -1,4 +1,4 @@
-module Lib.Numbers (diagonalCoordinates, combinations, primes) where
+module Lib.Numbers (diagonalCoordinates, combinations, primes, manhattan) where
 
 -- >>> take 5 diagonalCoordinates
 -- [(0,0),(1,0),(0,1),(2,0),(1,1)]
@@ -20,3 +20,8 @@ primes :: [Int]
 primes = 2 : filter isPrime [3,5..]
   where
     isPrime n = all (\p -> n `mod` p /= 0) $ takeWhile (\d -> d*d <= n) primes
+
+-- >>> manhattan (-12, 35)
+-- 47
+manhattan :: (Int, Int) -> Int
+manhattan (y, x) = abs y + abs x
