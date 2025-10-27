@@ -6,7 +6,7 @@ module Days.Day01 (day01a, day01b) where
 import Data.List.Split (splitOn)
 import Data.List (foldl')
 import qualified Data.Set as S
-import Lib.Numbers (manhattan)
+import Lib.Numbers (manhattan, range)
 
 {------------------------------{ 1st part }------------------------------}
 
@@ -68,8 +68,6 @@ expandPath xs = concat $ zipWith expand xs (tail xs)
       | x1 == x2 = [(y,x1) | y <- range y1 y2]
       | y1 == y2 = [(y1,x) | x <- range x1 x2]
       | otherwise = []
-    range a b | a < b     = [a+1..b]
-              | otherwise = [a-1, a-2..b]
 
 findFirstDuped :: [Coord] -> Coord
 findFirstDuped = go S.empty

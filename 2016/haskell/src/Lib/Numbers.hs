@@ -1,4 +1,4 @@
-module Lib.Numbers (diagonalCoordinates, combinations, primes, manhattan) where
+module Lib.Numbers (diagonalCoordinates, combinations, primes, manhattan, range) where
 
 -- >>> take 5 diagonalCoordinates
 -- [(0,0),(1,0),(0,1),(2,0),(1,1)]
@@ -25,3 +25,10 @@ primes = 2 : filter isPrime [3,5..]
 -- 47
 manhattan :: (Int, Int) -> Int
 manhattan (y, x) = abs y + abs x
+
+-- >>> range 10 3
+-- [9,8,7,6,5,4,3]
+range :: Int -> Int -> [Int]
+range a b
+    | a < b     = [a + 1 .. b]
+    | otherwise = [a - 1, a - 2 .. b]
