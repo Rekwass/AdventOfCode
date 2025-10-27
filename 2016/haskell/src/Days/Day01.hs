@@ -59,7 +59,7 @@ day01b :: String -> String
 day01b = show . part2 . parseLine
 
 part2 :: [Turn] -> Int
-part2 xs = manhattan $ findFirstDuped $ expandPath $ scanl step (0, 0, N) xs
+part2 = manhattan . findFirstDuped . expandPath . scanl step (0, 0, N)
 
 expandPath :: [CoordD] -> [Coord]
 expandPath xs = concat $ zipWith expand xs (tail xs)
