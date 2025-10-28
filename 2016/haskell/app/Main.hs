@@ -2,6 +2,7 @@
 module Main (main) where
 
 import Days.Day01 (day01a, day01b)
+import Days.Day02 (day02a, day02b)
 
 import System.Environment (getArgs)
 
@@ -180,4 +181,6 @@ initialState = St { _day = d, _part = p, _step = ChooseDay }
 aoc :: Day -> Part -> Input -> String
 aoc 1  1 = day01a
 aoc 1  2 = day01b
+aoc 2  1 = day02a
+aoc 2  2 = day02b
 aoc _  _ = const "Not implemented yet!"
