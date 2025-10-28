@@ -22,9 +22,11 @@ source-repository head
 
 library
   exposed-modules:
+      Days
       Days.Day01
       Days.Day02
       Days.Day03
+      Days.Day04
       Lib.Algorithm
       Lib.MyDialog
       Lib.Numbers

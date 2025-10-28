@@ -1,9 +1,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Main (main) where
 
-import Days.Day01 (day01a, day01b)
-import Days.Day02 (day02a, day02b)
-import Days.Day03 (day03a, day03b)
+import Days
 
 import System.Environment (getArgs)
 
@@ -186,4 +184,6 @@ aoc 2  1 = day02a
 aoc 2  2 = day02b
 aoc 3  1 = day03a
 aoc 3  2 = day03b
+aoc 4  1 = day04a
+aoc 4  2 = day04b
 aoc _  _ = const "Not implemented yet!"
