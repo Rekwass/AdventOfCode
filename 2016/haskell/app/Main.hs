@@ -3,6 +3,7 @@ module Main (main) where
 
 import Days.Day01 (day01a, day01b)
 import Days.Day02 (day02a, day02b)
+import Days.Day03 (day03a, day03b)
 
 import System.Environment (getArgs)
 
@@ -183,4 +184,6 @@ aoc 1  1 = day01a
 aoc 1  2 = day01b
 aoc 2  1 = day02a
 aoc 2  2 = day02b
+aoc 3  1 = day03a
+aoc 3  2 = day03b
 aoc _  _ = const "Not implemented yet!"

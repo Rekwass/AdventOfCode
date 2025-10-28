@@ -24,6 +24,7 @@ library
   exposed-modules:
       Days.Day01
       Days.Day02
+      Days.Day03
       Lib.Algorithm
       Lib.MyDialog
       Lib.Numbers
