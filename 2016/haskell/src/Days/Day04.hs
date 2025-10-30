@@ -1,4 +1,6 @@
 {-# LANGUAGE QuasiQuotes #-}
+{-# OPTIONS_GHC -Wno-x-partial #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 
 module Days.Day04 (day04a, day04b) where
 
