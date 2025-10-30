@@ -28,6 +28,7 @@ library
       Days.Day03
       Days.Day04
       Lib.Algorithm
+      Lib.Cipher
       Lib.MyDialog
       Lib.Numbers
   other-modules:
