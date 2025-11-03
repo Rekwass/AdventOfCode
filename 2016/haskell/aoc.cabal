@@ -27,6 +27,7 @@ library
       Days.Day02
       Days.Day03
       Days.Day04
+      Days.Day05
       Lib.Algorithm
       Lib.Cipher
       Lib.MyDialog
@@ -43,7 +44,9 @@ library
     , brick >=2.4
     , bytestring >=0.11.5.3
     , containers >=0.6.7
+    , cryptohash >=0.11.9
     , hashable >=1.4.3.0
+    , memory >=0.18.0
     , microlens >=0.4.13.1
     , microlens-mtl >=0.2.0.3
     , microlens-th >=0.4.3.17
@@ -72,7 +75,9 @@ executable aoc-exe
     , brick >=2.4
     , bytestring >=0.11.5.3
     , containers >=0.6.7
+    , cryptohash >=0.11.9
     , hashable >=1.4.3.0
+    , memory >=0.18.0
     , microlens >=0.4.13.1
     , microlens-mtl >=0.2.0.3
     , microlens-th >=0.4.3.17
