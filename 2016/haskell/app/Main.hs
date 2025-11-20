@@ -4,6 +4,7 @@ module Main (main) where
 import Days
 
 import System.Environment (getArgs)
+import Text.Printf
 
 import Lens.Micro ((^.))
 import Lens.Micro.TH (makeLenses)
@@ -104,7 +105,7 @@ drawUI st =
     where
       dayLayer = renderDialog (st^.day)
       partLayer = renderDialog (st^.part)
-      doneLayer d p = C.centerLayer $ C.withDefAttr dialogAttr $ C.hLimit 50 $ C.vLimit 5 $ C.joinBorders $ C.withBorderStyle unicode $ borderWithLabel (str $ "{ Day " <> show d <> ", part " <> show p <> " }") (C.center $ C.withDefAttr buttonAttr (str $ " " <> aoc d p (unsafePerformIO (readFile ("../inputs/day" <> show d <> ".txt"))) <> " "))
+      doneLayer d p = C.centerLayer $ C.withDefAttr dialogAttr $ C.hLimit 50 $ C.vLimit 5 $ C.joinBorders $ C.withBorderStyle unicode $ borderWithLabel (str $ "{ Day " <> show d <> ", part " <> show p <> " }") (C.center $ C.withDefAttr buttonAttr (str $ " " <> aoc d p (unsafePerformIO (readFile ("../inputs/day" <> printf "%02d" d <> ".txt"))) <> " "))
       -- TODO: Find another way to compute than running unsafePerformIO in the UI part...
 
 appEvent :: BrickEvent Name e -> T.EventM Name St ()
@@ -192,4 +193,6 @@ aoc 6  1 = day06a
 aoc 6  2 = day06b
 aoc 7  1 = day07a
 aoc 7  2 = day07b
+aoc 8  1 = day08a
+aoc 8  2 = day08b
 aoc _  _ = const "Not implemented yet!"
