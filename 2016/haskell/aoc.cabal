@@ -30,6 +30,7 @@ library
       Days.Day05
       Days.Day06
       Days.Day07
+      Days.Day08
       Lib.Algorithm
       Lib.Cipher
       Lib.MyDialog
