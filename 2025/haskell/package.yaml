@@ -1,0 +1,58 @@
+name:                aoc
+version:             0.1.0.0
+github:              "Rekwass/AdventOfCode"
+license:             BSD3
+author:              "Nicolas MOINARD"
+maintainer:          "rekwass@gmail.com"
+copyright:           "Copyright (c) 2025, Nicolas MOINARD"
+
+description:         Please see the README on GitHub at <https://github.com/Rekwass/AdventOfCode#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- split >= 0.2.5
+- MissingH >= 1.6.0.1
+- containers >= 0.6.7
+- aeson >= 2.1.2.1
+- bytestring >= 0.11.5.3
+- scientific >= 0.3.7.0
+- vector >= 0.13.1.0
+- text >= 2.0.2
+- pcre-heavy >= 1.0.0.3
+- safe >= 0.3.21
+- vty >= 6.2
+- brick >= 2.4
+- microlens >= 0.4.13.1
+- microlens-th >= 0.4.3.17
+- microlens-mtl >= 0.2.0.3
+- hashable >= 1.4.3.0
+- psqueues >= 0.2.8.0
+- cryptohash >= 0.11.9
+- memory >= 0.18.0
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+  ghc-options: -Wall
+
+executables:
+  aoc-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -O2
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - aoc
