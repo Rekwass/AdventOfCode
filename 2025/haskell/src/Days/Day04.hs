@@ -32,7 +32,7 @@ neighbours (y, x) = [(y+dy, x+dx) | (dy, dx) <- dirs]
 day04b :: String -> String
 day04b = show . part2 . parseLines . lines
 
-part2 :: S.Set Coord -> Int
+part2 :: Papers -> Int
 part2 xs = S.size xs - S.size xs'
   where
     xs' = fst . head . dropWhile canRemovePaper $ zip steps' (tail steps')
