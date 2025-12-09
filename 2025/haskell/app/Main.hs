@@ -193,4 +193,6 @@ aoc 6   1 = day06a
 aoc 6   2 = day06b
 aoc 7   1 = day07a
 aoc 7   2 = day07b
+aoc 8   1 = day08a
+aoc 8   2 = day08b
 aoc _  _ = const "Not implemented yet!"
