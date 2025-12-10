@@ -13,13 +13,13 @@ day04a :: String -> String
 day04a = show . part1 . parseLines . lines
 
 parseLines :: [String] -> Papers
-parseLines = S.fromList . concat . zipWith (\y row -> [(y, x) | (x,'@') <- zip [0..] row]) [0..]
+parseLines ls = S.fromList [(y, x) | (r, y) <- zip ls [0..], ('@', x) <- zip r [0..]]
 
 part1 :: Papers -> Int
 part1 xs = S.size . S.filter (isAccessible xs) $ xs
 
 dirs :: [Coord]
-dirs = [(1,0), (1,1), (0,1), (-1,1), (-1,0), (-1,-1), (0,-1), (1,-1)]
+dirs = [(y, x) | x <- [-1,0,1], y <- [-1,0,1], (y, x) /= (0,0)]
 
 isAccessible :: Papers -> Coord -> Bool
 isAccessible xs x = (<4) . length . filter (`S.member` xs) $ neighbours x
