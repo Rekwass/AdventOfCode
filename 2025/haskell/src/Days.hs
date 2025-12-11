@@ -8,3 +8,4 @@ import Days.Day05 as X
 import Days.Day06 as X
 import Days.Day07 as X
 import Days.Day08 as X
+import Days.Day09 as X
