@@ -179,22 +179,26 @@ initialState = St { _day = d, _part = p, _step = ChooseDay }
                   ]
 
 aoc :: Day -> Part -> Input -> String
-aoc 1   1 = day01a
-aoc 1   2 = day01b
-aoc 2   1 = day02a
-aoc 2   2 = day02b
-aoc 3   1 = day03a
-aoc 3   2 = day03b
-aoc 4   1 = day04a
-aoc 4   2 = day04b
-aoc 5   1 = day05a
-aoc 5   2 = day05b
-aoc 6   1 = day06a
-aoc 6   2 = day06b
-aoc 7   1 = day07a
-aoc 7   2 = day07b
-aoc 8   1 = day08a
-aoc 8   2 = day08b
-aoc 9   1 = day09a
-aoc 9   2 = day09b
+aoc 1    1 = day01a
+aoc 1    2 = day01b
+aoc 2    1 = day02a
+aoc 2    2 = day02b
+aoc 3    1 = day03a
+aoc 3    2 = day03b
+aoc 4    1 = day04a
+aoc 4    2 = day04b
+aoc 5    1 = day05a
+aoc 5    2 = day05b
+aoc 6    1 = day06a
+aoc 6    2 = day06b
+aoc 7    1 = day07a
+aoc 7    2 = day07b
+aoc 8    1 = day08a
+aoc 8    2 = day08b
+aoc 9    1 = day09a
+aoc 9    2 = day09b
+aoc 10   1 = day10a
+aoc 10   2 = day10b
+aoc 11   1 = day11a
+aoc 11   2 = day11b
 aoc _  _ = const "Not implemented yet!"

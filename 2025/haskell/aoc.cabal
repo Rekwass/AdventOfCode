@@ -32,6 +32,8 @@ library
       Days.Day07
       Days.Day08
       Days.Day09
+      Days.Day10
+      Days.Day11
       Lib.Algorithm
       Lib.Cipher
       Lib.MyDialog
@@ -42,7 +44,8 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -Wall
   build-depends:
-      MissingH >=1.6.0.1
+      MemoTrie >=0.6.11
+    , MissingH >=1.6.0.1
     , aeson >=2.1.2.1
     , base >=4.7 && <5
     , brick >=2.4
@@ -55,6 +58,7 @@ library
     , microlens >=0.4.13.1
     , microlens-mtl >=0.2.0.3
     , microlens-th >=0.4.3.17
+    , parsec >=3.1.17.0
     , pcre-heavy >=1.0.0.3
     , psqueues >=0.2.8.0
     , safe >=0.3.21
@@ -73,7 +77,8 @@ executable aoc-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -O2 -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      MissingH >=1.6.0.1
+      MemoTrie >=0.6.11
+    , MissingH >=1.6.0.1
     , aeson >=2.1.2.1
     , aoc
     , base >=4.7 && <5
@@ -87,6 +92,7 @@ executable aoc-exe
     , microlens >=0.4.13.1
     , microlens-mtl >=0.2.0.3
     , microlens-th >=0.4.3.17
+    , parsec >=3.1.17.0
     , pcre-heavy >=1.0.0.3
     , psqueues >=0.2.8.0
     , safe >=0.3.21
