@@ -32,6 +32,7 @@ library
       Days.Day07
       Days.Day08
       Days.Day09
+      Days.Day10
       Lib.Algorithm
       Lib.Cipher
       Lib.MyDialog
@@ -54,6 +55,7 @@ library
     , microlens >=0.4.13.1
     , microlens-mtl >=0.2.0.3
     , microlens-th >=0.4.3.17
+    , parsec >=3.1.17.0
     , pcre-heavy >=1.0.0.3
     , psqueues >=0.2.8.0
     , safe >=0.3.21
@@ -85,6 +87,7 @@ executable aoc-exe
     , microlens >=0.4.13.1
     , microlens-mtl >=0.2.0.3
     , microlens-th >=0.4.3.17
+    , parsec >=3.1.17.0
     , pcre-heavy >=1.0.0.3
     , psqueues >=0.2.8.0
     , safe >=0.3.21
