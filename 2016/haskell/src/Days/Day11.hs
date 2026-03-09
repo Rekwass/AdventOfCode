@@ -69,13 +69,13 @@ floorIsSafe :: Facility -> Int -> Int -> Bool
 floorIsSafe fa n f
   | noChips = True
   | noGens = True
-  | otherwise = null unprotectedChips
+  | otherwise = null friedChips
   where
     noChips = null chipsHere
     noGens = null gensHere
     chipsHere = [i | i <- [1..n], chipFloor i fa == f]
     gensHere = [i | i <- [1..n], genFloor i fa == f]
-    unprotectedChips = [undefined | i <- chipsHere, genFloor i fa /= f]
+    friedChips = [i | i <- chipsHere, genFloor i fa /= f]
 
 -- INFO: Current elevator position
 elevator :: Facility -> Int
