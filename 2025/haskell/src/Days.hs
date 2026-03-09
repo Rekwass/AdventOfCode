@@ -11,3 +11,4 @@ import Days.Day08 as X
 import Days.Day09 as X
 import Days.Day10 as X
 import Days.Day11 as X
+import Days.Day12 as X

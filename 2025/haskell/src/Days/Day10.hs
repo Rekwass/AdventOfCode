@@ -50,10 +50,8 @@ numberList = number `sepBy` char ','
 number :: Parser Int
 number = read <$> many1 digit
 
--- part1 :: [Machine] -> Int
-part1 ms = sum $ aaa
-  where
-    aaa = map (\(ls, bs, _) -> myDijkstra (replicate (length ls) False) (getNeighbours' bs) (isEnd ls)) ms
+part1 :: [Machine] -> Int
+part1 = sum . map (\(ls, bs, _) -> myDijkstra (replicate (length ls) False) (getNeighbours' bs) (isEnd ls))
 
 getNeighbours' :: [[Int]] -> [Bool] -> [([Bool], Int)]
 getNeighbours' bss ls = [(pressBtn bs ls, 1) | bs <- bss]
