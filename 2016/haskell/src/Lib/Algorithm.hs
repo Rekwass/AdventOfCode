@@ -1,11 +1,48 @@
-module Lib.Algorithm (dijkstra, dijkstraAllShortestPaths, bronKerboschPivot) where
+module Lib.Algorithm (bfs, bfsDist, dijkstra, dijkstraAllShortestPaths, bronKerboschPivot) where
 
 import Data.Hashable (Hashable)
 import qualified Data.HashPSQ as H
 import qualified Data.Set as S
 import qualified Data.Map as M
+import qualified Data.HashSet as HS
 import Data.Maybe (fromJust, mapMaybe)
-import Data.List (mapAccumL)
+import Data.List (mapAccumL, foldl')
+import qualified Data.Sequence as Sq
+
+bfs :: (Ord v, Hashable v) => Sq.Seq v -> HS.HashSet v -> M.Map v v -> (v -> [v]) -> (v -> Bool) -> Maybe (M.Map v v)
+bfs queue explored prev getNeighbours isGoal =
+  case Sq.viewl queue of
+    Sq.EmptyL          -> Nothing
+    current Sq.:< rest ->
+      if isGoal current
+        then Just prev
+      else
+        let neighbours =
+              [ nbr
+              | nbr <- getNeighbours current
+              , not $ nbr `HS.member` explored
+              ]
+            queue'    = rest Sq.>< Sq.fromList neighbours
+            explored' = HS.insert current explored
+            prev'     = foldl' (\m nbr -> M.insert nbr current m)
+                              prev
+                              neighbours
+        in bfs queue' explored' prev' getNeighbours isGoal
+
+bfsDist :: (Hashable v) => v -> (v -> [v]) -> (v -> Bool) -> Int
+bfsDist start getNeighbours isGoal = go firstQueue firstVisited
+  where
+    firstQueue   = Sq.singleton (start, 0)
+    firstVisited = HS.singleton start
+    go queue visited
+      | Sq.null queue  = error "No solution"
+      | isGoal current = steps
+      | otherwise      = go queue' visited'
+      where
+        ((current, steps) Sq.:< rest) = Sq.viewl queue
+        neighs   = filter (not . (`HS.member` visited)) . getNeighbours $ current
+        queue'   = rest Sq.>< Sq.fromList [ (n, steps+1) | n <- neighs ]
+        visited' = foldl' (flip HS.insert) visited neighs
 
 dijkstra :: (Num c, Ord c, Hashable v, Ord v) => H.HashPSQ v c c -> M.Map v c -> M.Map v v -> (v -> [(v, c)]) -> (v -> Bool) -> Maybe (M.Map v v)
 dijkstra queue dist prev getNeighbours isGoal

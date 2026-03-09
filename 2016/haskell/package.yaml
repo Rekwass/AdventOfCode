@@ -30,6 +30,7 @@ dependencies:
 - cryptohash >= 0.11.9
 - memory >= 0.18.0
 - parsec >= 3.1.17.0
+- unordered-containers >= 0.2.20
 
 ghc-options:
 - -Wall
