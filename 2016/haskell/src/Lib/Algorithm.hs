@@ -1,4 +1,4 @@
-module Lib.Algorithm (bfs, bfsDist, dijkstra, dijkstraAllShortestPaths, bronKerboschPivot) where
+module Lib.Algorithm (bfs, bfsDist, bfsNbExplored, dijkstra, dijkstraAllShortestPaths, bronKerboschPivot) where
 
 import Data.Hashable (Hashable)
 import qualified Data.HashPSQ as H
@@ -41,6 +41,20 @@ bfsDist start getNeighbours isGoal = go firstQueue firstVisited
       where
         ((current, steps) Sq.:< rest) = Sq.viewl queue
         neighs   = filter (not . (`HS.member` visited)) . getNeighbours $ current
+        queue'   = rest Sq.>< Sq.fromList [ (n, steps+1) | n <- neighs ]
+        visited' = foldl' (flip HS.insert) visited neighs
+
+bfsNbExplored :: (Hashable v) => v -> (v -> [v]) -> Int -> Int
+bfsNbExplored start getNeighbours maxStep = go firstQueue firstVisited
+  where
+    firstQueue   = Sq.singleton (start, 0)
+    firstVisited = HS.singleton start
+    go queue visited
+      | Sq.null queue  = HS.size visited
+      | otherwise      = go queue' visited'
+      where
+        ((current, steps) Sq.:< rest) = Sq.viewl queue
+        neighs   = filter (\n -> steps < maxStep && not (n `HS.member` visited)) . getNeighbours $ current
         queue'   = rest Sq.>< Sq.fromList [ (n, steps+1) | n <- neighs ]
         visited' = foldl' (flip HS.insert) visited neighs
 
