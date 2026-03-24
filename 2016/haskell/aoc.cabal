@@ -36,6 +36,7 @@ library
       Days.Day11
       Days.Day12
       Days.Day13
+      Days.Day14
       Lib.Algorithm
       Lib.Cipher
       Lib.MyDialog
@@ -49,10 +50,11 @@ library
       MissingH >=1.6.0.1
     , aeson >=2.1.2.1
     , base >=4.7 && <5
+    , base16-bytestring >=1.0.2.0
     , brick >=2.4
     , bytestring >=0.11.5.3
     , containers >=0.6.7
-    , cryptohash >=0.11.9
+    , cryptohash-md5 >=0.11.101.0
     , hashable >=1.4.3.0
     , linear >=1.23.2
     , memory >=0.18.0
@@ -83,10 +85,11 @@ executable aoc-exe
     , aeson >=2.1.2.1
     , aoc
     , base >=4.7 && <5
+    , base16-bytestring >=1.0.2.0
     , brick >=2.4
     , bytestring >=0.11.5.3
     , containers >=0.6.7
-    , cryptohash >=0.11.9
+    , cryptohash-md5 >=0.11.101.0
     , hashable >=1.4.3.0
     , linear >=1.23.2
     , memory >=0.18.0
