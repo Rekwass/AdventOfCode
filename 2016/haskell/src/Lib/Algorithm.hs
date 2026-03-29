@@ -1,4 +1,4 @@
-module Lib.Algorithm (bfs, bfsDist, bfsNbExplored, dijkstra, dijkstraAllShortestPaths, bronKerboschPivot) where
+module Lib.Algorithm (bfs, bfsDist, dfsAllDists, bfsNbExplored, dijkstra, dijkstraAllShortestPaths, bronKerboschPivot) where
 
 import Data.Hashable (Hashable)
 import qualified Data.HashPSQ as H
@@ -6,14 +6,15 @@ import qualified Data.Set as S
 import qualified Data.Map as M
 import qualified Data.HashSet as HS
 import Data.Maybe (fromJust, mapMaybe)
-import Data.List (mapAccumL, foldl')
-import qualified Data.Sequence as Sq
+import Data.List (mapAccumL, foldl', sort)
+import qualified Data.Sequence as SQ
 
-bfs :: (Ord v, Hashable v) => Sq.Seq v -> HS.HashSet v -> M.Map v v -> (v -> [v]) -> (v -> Bool) -> Maybe (M.Map v v)
+-- PERF: Need to use recursion instead of storing queue in a Sequence like DFS
+bfs :: (Ord v, Hashable v) => SQ.Seq v -> HS.HashSet v -> M.Map v v -> (v -> [v]) -> (v -> Bool) -> Maybe (M.Map v v)
 bfs queue explored prev getNeighbours isGoal =
-  case Sq.viewl queue of
-    Sq.EmptyL          -> Nothing
-    current Sq.:< rest ->
+  case SQ.viewl queue of
+    SQ.EmptyL          -> Nothing
+    current SQ.:< rest ->
       if isGoal current
         then Just prev
       else
@@ -22,41 +23,54 @@ bfs queue explored prev getNeighbours isGoal =
               | nbr <- getNeighbours current
               , not $ nbr `HS.member` explored
               ]
-            queue'    = rest Sq.>< Sq.fromList neighbours
+            queue'    = rest SQ.>< SQ.fromList neighbours
             explored' = HS.insert current explored
             prev'     = foldl' (\m nbr -> M.insert nbr current m)
                               prev
                               neighbours
         in bfs queue' explored' prev' getNeighbours isGoal
 
+-- PERF: Need to use recursion instead of storing queue in a Sequence like DFS
 bfsDist :: (Hashable v) => v -> (v -> [v]) -> (v -> Bool) -> Int
 bfsDist start getNeighbours isGoal = go firstQueue firstVisited
   where
-    firstQueue   = Sq.singleton (start, 0)
+    firstQueue   = SQ.singleton (start, 0)
     firstVisited = HS.singleton start
     go queue visited
-      | Sq.null queue  = error "No solution"
+      | SQ.null queue  = error "No solution"
       | isGoal current = steps
       | otherwise      = go queue' visited'
       where
-        ((current, steps) Sq.:< rest) = Sq.viewl queue
+        ((current, steps) SQ.:< rest) = SQ.viewl queue
         neighs   = filter (not . (`HS.member` visited)) . getNeighbours $ current
-        queue'   = rest Sq.>< Sq.fromList [ (n, steps+1) | n <- neighs ]
+        queue'   = rest SQ.>< SQ.fromList [ (n, steps+1) | n <- neighs ]
         visited' = foldl' (flip HS.insert) visited neighs
 
+-- PERF: Need to use recursion instead of storing queue in a Sequence like DFS
 bfsNbExplored :: (Hashable v) => v -> (v -> [v]) -> Int -> Int
 bfsNbExplored start getNeighbours maxStep = go firstQueue firstVisited
   where
-    firstQueue   = Sq.singleton (start, 0)
+    firstQueue   = SQ.singleton (start, 0)
     firstVisited = HS.singleton start
     go queue visited
-      | Sq.null queue  = HS.size visited
+      | SQ.null queue  = HS.size visited
       | otherwise      = go queue' visited'
       where
-        ((current, steps) Sq.:< rest) = Sq.viewl queue
+        ((current, steps) SQ.:< rest) = SQ.viewl queue
         neighs   = filter (\n -> steps < maxStep && not (n `HS.member` visited)) . getNeighbours $ current
-        queue'   = rest Sq.>< Sq.fromList [ (n, steps+1) | n <- neighs ]
+        queue'   = rest SQ.>< SQ.fromList [ (n, steps+1) | n <- neighs ]
         visited' = foldl' (flip HS.insert) visited neighs
+
+dfsAllDists :: (Hashable v) => v -> (v -> [v]) -> (v -> Bool) -> [Int]
+dfsAllDists start getNeighbours isGoal = 
+    sort $ go start 0 (HS.singleton start)
+  where
+    go current steps visited
+      | isGoal current = [steps]
+      | otherwise =
+          let neighs = filter (not . (`HS.member` visited)) (getNeighbours current)
+              visited' = foldl' (flip HS.insert) visited neighs
+          in concat [ go n (steps + 1) visited' | n <- neighs ]
 
 dijkstra :: (Num c, Ord c, Hashable v, Ord v) => H.HashPSQ v c c -> M.Map v c -> M.Map v v -> (v -> [(v, c)]) -> (v -> Bool) -> Maybe (M.Map v v)
 dijkstra queue dist prev getNeighbours isGoal
@@ -95,7 +109,6 @@ dijkstraAllShortestPaths queue dist prev getNeighbours isGoal
       paths = foldr M.delete prev . filter ((> bestDist) . (dist M.!)) $ goalNodes
       goalNodes = filter isGoal . M.keys $ dist
       bestDist = minimum . map (dist M.!) $ goalNodes
-
 
 {-
 Pseudocode from: https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm#With_pivoting
