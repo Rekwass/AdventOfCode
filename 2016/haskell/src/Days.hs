@@ -18,3 +18,4 @@ import Days.Day15 as X
 import Days.Day16 as X
 import Days.Day17 as X
 import Days.Day18 as X
+import Days.Day19 as X

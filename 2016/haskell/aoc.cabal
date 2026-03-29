@@ -41,6 +41,7 @@ library
       Days.Day16
       Days.Day17
       Days.Day18
+      Days.Day19
       Lib.Algorithm
       Lib.Cipher
       Lib.MyDialog
