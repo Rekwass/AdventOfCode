@@ -1,21 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NumericUnderscores #-}
+{-# OPTIONS_GHC -Wno-x-partial #-}
 
 module Days.Day10 (day10a, day10b) where
 
 import qualified Data.Text as T
 import qualified Data.Map as M
 import qualified Data.HashPSQ as H
-import qualified Data.Vector as V
 import Text.Parsec
 import Text.Parsec.Text (Parser)
 import Data.Either (fromRight)
 import Lib.Algorithm (dijkstra)
 import Data.Maybe (fromJust, isNothing)
 
-import Data.Hashable
-
-instance Hashable a => Hashable (V.Vector a) where
-  hashWithSalt = foldl hashWithSalt
+import Data.MemoTrie (memo)
+import Data.List (subsequences)
 
 {------------------------------{ 1st part }------------------------------}
 
@@ -81,52 +80,45 @@ myDijkstra start getNeighbours isGoal
 
 {------------------------------{ 2nd part }------------------------------}
 
+-- INFO: Endedup using this method: https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/
+-- This does not involve writing a solver nor using one. It only uses part1 logic and smartly brute forces part2.
+
+type Buttons = [Int]
+type Voltage = [Int]
+
 day10b :: String -> String
 day10b = show . part2 . parseLines . lines
 
-type Machine' = ([Bool], [[Int]], V.Vector Int)
+part2 :: [Machine] -> Int
+part2 = sum . map (\(_, btns, voltage) -> compute btns voltage)
 
--- part2 :: [String] -> Int
-part2 ms = sum $ aaa
+compute :: [Buttons] -> Voltage -> Int
+compute btns = cachedCompute
   where
-    aaa = map (\(_, bs, js) -> myDijkstra' (V.fromList $ replicate (length js) 0) (getNeighbours'' js bs) (isEnd' js)) ms'
-    ms' = toVec ms
+    cachedCompute = memo go
+    go voltage
+      | isFinished voltage = 0
+      | null possibleComb = 1_000_000
+      | otherwise = minimum . map (\(v, c) -> 2 * cachedCompute v + c) $ voltageComb
+      where
+        possibleComb = getComb btns voltage
+        voltages = map (`pressComb` voltage) possibleComb
+        voltagesDiv2 = map (map (`div` 2)) voltages
+        voltageComb = zipWith (\v comb -> (v, length comb)) voltagesDiv2 possibleComb
 
-toVec :: [Machine] -> [Machine']
-toVec = map (\(ls, bs, js) -> (ls, bs, V.fromList js))
+isFinished :: Voltage -> Bool
+isFinished = all (== 0)
 
-getNeighbours'' :: V.Vector Int -> [[Int]] -> V.Vector Int -> [(V.Vector Int, Int)]
-getNeighbours'' og bss js = [res | bs <- bss, let res = (pressBtn' bs js, 1), isPossible og (fst res)]
+getComb :: [Buttons] -> Voltage -> [[Buttons]]
+getComb btns voltage = [comb | comb <- subsequences btns, isValidComb comb voltage]
 
-isPossible :: V.Vector Int -> V.Vector Int -> Bool
-isPossible og = all (\(l, r) -> r <= l) . V.zip og
+isValidComb :: [Buttons] -> Voltage -> Bool
+isValidComb btns voltage = all (\v -> v >= 0 && even v) $ pressComb btns voltage
 
-pressBtn' :: [Int] -> V.Vector Int -> V.Vector Int
--- pressBtn' bs js = foldl' (press bs) [] (V.zip js $ V.fromList [0..])
--- pressBtn' bs js = V.foldl press js bs
-pressBtn' bs js = js V.// [(b, (js V.! b) + 1) | b <- bs]
+pressComb :: [Buttons] -> Voltage -> Voltage
+pressComb btns voltage = zipWith (\ v i -> v - countOccur flatBtns i) voltage [0..]
+  where
+    flatBtns = concat btns
 
--- press :: V.Vector Int -> Int -> V.Vector Int
--- press acc i = acc V.// 
---   | i `elem` bs = acc ++ [j + 1]
---   | otherwise   = acc ++ [j]
-
-isEnd' :: V.Vector Int -> V.Vector Int -> Bool
-isEnd' = (==)
-
-myDijkstra' :: V.Vector Int -> (V.Vector Int -> [(V.Vector Int, Int)]) -> (V.Vector Int -> Bool) -> Int
-myDijkstra' start getNeighbours isGoal
-  | isNothing mPath = 0
-  | otherwise = (+ (-1)) . length $ backtrace end
-    where
-      mPath = dijkstra queue dist prev getNeighbours isGoal
-      path = fromJust mPath
-      end = head . filter isGoal . M.keys $ path
-      queue = H.singleton start 0 0
-      dist = M.singleton start 0
-      prev = M.empty
-      backtrace = go
-        where
-          go current
-            | current `M.notMember` path = [current]
-            | otherwise = current : go (path M.! current)
+countOccur :: Buttons -> Int -> Int
+countOccur btns i = length . filter (== i) $ btns
