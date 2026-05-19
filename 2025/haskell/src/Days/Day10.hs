@@ -15,6 +15,7 @@ import Data.Maybe (fromJust, isNothing)
 
 import Data.MemoTrie (memo)
 import Data.List (subsequences)
+import Data.Bifunctor (Bifunctor(first))
 
 {------------------------------{ 1st part }------------------------------}
 
@@ -93,30 +94,33 @@ part2 :: [Machine] -> Int
 part2 = sum . map (\(_, btns, voltage) -> compute btns voltage)
 
 compute :: [Buttons] -> Voltage -> Int
-compute btns = cachedCompute
+compute btns voltage = cachedCompute voltage
   where
     cachedCompute = memo go
-    go voltage
-      | isFinished voltage = 0
-      | null possibleComb = 1_000_000
-      | otherwise = minimum . map (\(v, c) -> 2 * cachedCompute v + c) $ voltageComb
+    allVoltageDelta = computeAllVoltageDelta btns (length voltage)
+    go voltage'
+      | isFinished voltage' = 0
+      | null goodVoltages = 1_000_000
+      | otherwise = minimum . map (\(v, c) -> 2 * cachedCompute v + c) $ finalVoltages
       where
-        possibleComb = getComb btns voltage
-        voltages = map (`pressComb` voltage) possibleComb
-        voltagesDiv2 = map (map (`div` 2)) voltages
-        voltageComb = zipWith (\v comb -> (v, length comb)) voltagesDiv2 possibleComb
+        allVoltages = map (pressComb' voltage') allVoltageDelta
+        goodVoltages = filter goodVoltage allVoltages
+        finalVoltages = map (first (map (`div` 2))) goodVoltages
 
 isFinished :: Voltage -> Bool
 isFinished = all (== 0)
 
-getComb :: [Buttons] -> Voltage -> [[Buttons]]
-getComb btns voltage = [comb | comb <- subsequences btns, isValidComb comb voltage]
+pressComb' :: Voltage -> (Voltage, Int) -> (Voltage, Int)
+pressComb' voltage (voltageDelta, presses) = (zipWith (-) voltage voltageDelta, presses)
 
-isValidComb :: [Buttons] -> Voltage -> Bool
-isValidComb btns voltage = all (\v -> v >= 0 && even v) $ pressComb btns voltage
+goodVoltage :: (Voltage, Int) -> Bool
+goodVoltage (v, _) = all even v && all (>=0 ) v
 
-pressComb :: [Buttons] -> Voltage -> Voltage
-pressComb btns voltage = zipWith (\ v i -> v - countOccur flatBtns i) voltage [0..]
+computeAllVoltageDelta :: [Buttons] -> Int -> [(Voltage, Int)]
+computeAllVoltageDelta btns len = [computeDelta comb len | comb <- subsequences btns]
+
+computeDelta :: [Buttons] -> Int -> (Voltage, Int)
+computeDelta btns len = (map (countOccur flatBtns) [0..(len - 1)], length btns)
   where
     flatBtns = concat btns
 
